@@ -1,0 +1,13 @@
+variables:
+  GET_SOURCES_ATTEMPTS: 3
+
+stages:
+  - test
+
+flake8:
+  stage: test
+  image: python:2.7-alpine
+  before_script:
+    - pip install flake8
+  script:
+    - flake8
