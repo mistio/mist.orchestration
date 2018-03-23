@@ -19,8 +19,8 @@ from mist.api.auth.models import ApiToken
 
 from mist.api.tag.methods import add_tags_to_resource, get_tags_for_resource
 
-from mist.core.orchestration.helpers import download, unpack, find_path
-from mist.core.orchestration.models import Template, Stack
+from mist.orchestration.helpers import download, unpack, find_path
+from mist.orchestration.models import Template, Stack
 
 from mist.api.exceptions import BadRequestError
 from mist.api.exceptions import ConflictError

@@ -7,7 +7,7 @@ from pyramid.response import Response
 from mist.api.helpers import trigger_session_update
 
 from mist.api.helpers import view_config
-from mist.core.orchestration import methods
+from mist.orchestration import methods
 from mist.api.auth.methods import auth_context_from_request
 from mist.api.helpers import params_from_request
 from mist.api.exceptions import NotFoundError, UnauthorizedError
@@ -22,7 +22,7 @@ from mist.api.tag.methods import add_tags_to_resource
 
 from mist.api.logs.methods import get_stories
 
-from mist.core.orchestration.models import Template, Stack
+from mist.orchestration.models import Template, Stack
 
 from mist.api import config
 
