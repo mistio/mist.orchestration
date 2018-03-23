@@ -9,3 +9,9 @@ exclude =
     .git/,
     __pycache__/,
     env/,
+
+    # Code files that need pep8 fixes.
+        ./mist/orchestration/__init__.py,
+        ./mist/core/orchestration/methods.py,
+        ./mist/core/orchestration/models.py,
+        ./mist/core/orchestration/views.py,
