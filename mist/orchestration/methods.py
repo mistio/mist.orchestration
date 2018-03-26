@@ -21,11 +21,11 @@ from mist.api.tag.methods import add_tags_to_resource, get_tags_for_resource
 
 from mist.orchestration.helpers import download, unpack, find_path
 from mist.orchestration.models import Template, Stack
+from mist.orchestration.exceptions import WorkflowExecutionError
 
 from mist.api.exceptions import BadRequestError
 from mist.api.exceptions import ConflictError
 from mist.api.exceptions import RequiredParameterMissingError
-from mist.core.exceptions import WorkflowExecutionError
 
 from mist.api.logs.methods import log_event
 

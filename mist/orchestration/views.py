@@ -13,7 +13,6 @@ from mist.api.helpers import params_from_request
 from mist.api.exceptions import NotFoundError, UnauthorizedError
 from mist.api.exceptions import RequiredParameterMissingError
 from mist.api.exceptions import BadRequestError
-from mist.core.exceptions import TemplateParseError
 from mist.api.exceptions import BadRequestError
 from mist.api.exceptions import ConflictError
 
@@ -23,6 +22,7 @@ from mist.api.tag.methods import add_tags_to_resource
 from mist.api.logs.methods import get_stories
 
 from mist.orchestration.models import Template, Stack
+from mist.orchestration.exceptions import TemplateParseError
 
 from mist.api import config
 
