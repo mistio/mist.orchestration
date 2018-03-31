@@ -38,6 +38,8 @@ log = logging.getLogger(__name__)
              renderer='json')
 def add_template(request):
     """
+    Tags: orchestration
+    ---
     Add template to user/org templates
     ---
     name:
@@ -135,7 +137,10 @@ def add_template(request):
 @view_config(route_name='api_v1_template', request_method='DELETE',
              renderer='json')
 def delete_template(request):
-    """Delete template given REMOVE permission has been granted
+    """
+    Tags: orchestration
+    ---
+    Delete template given REMOVE permission has been granted
        Users may delete a template
     ---
     template_id:
@@ -161,8 +166,11 @@ def delete_template(request):
 @view_config(route_name='api_v1_template', request_method='PUT',
              renderer='json')
 def edit_template(request):
-    """ Edit template given EDIT permission has been granted
-        Users may edit a template's name and description
+    """
+    Tags: orchestration
+    ---
+    Edit template given EDIT permission has been granted
+    Users may edit a template's name and description
     ---
     template_id:
       type: string
@@ -197,7 +205,11 @@ def edit_template(request):
 # SEC TODO add required permissions to docstring
 @view_config(route_name='api_v1_templates', request_method='GET', renderer='json')
 def list_templates(request):
-    """List user templates"""
+    """
+    Tags: orchestration
+    ---
+    List user templates
+    """
 
     # SEC
     auth_context = auth_context_from_request(request)
@@ -209,7 +221,11 @@ def list_templates(request):
 # SEC TODO add required permissions to docstring
 @view_config(route_name='api_v1_stacks', request_method='GET', renderer='json')
 def list_stacks(request):
-    """List user stacks"""
+    """
+    Tags: orchestration
+    ---
+    List user stacks
+    """
     auth_context = auth_context_from_request(request)
     # SEC
     auth_context.check_perm('stack', 'read', None)
@@ -219,7 +235,11 @@ def list_stacks(request):
 # SEC TODO add required permissions to docstring
 @view_config(route_name='api_v1_template', request_method='GET', renderer='json')
 def show_template(request):
-    """Show template details and job history"""
+    """
+    Tags: orchestration
+    ---
+    Show template details and job history
+    """
     auth_context = auth_context_from_request(request)
 
     template_id = request.matchdict['template_id']
@@ -238,7 +258,11 @@ def show_template(request):
 # SEC FIXME document permissions in docstring
 @view_config(route_name='api_v1_stacks', request_method='POST', renderer='json')
 def create_stack(request):
-    """Start a template job to run the template"""
+    """
+    Tags: orchestration
+    ---
+    Start a template job to run the template
+    """
     auth_context = auth_context_from_request(request)
 
     # SEC
@@ -309,7 +333,11 @@ def create_stack(request):
 # SEC FIXME implement & document permission checks
 @view_config(route_name='api_v1_stack', request_method='POST', renderer='json')
 def run_workflow(request):
-    """Start a template job to run the template"""
+    """
+    Tags: orchestration
+    ---
+    Start a template job to run the template
+    """
     auth_context = auth_context_from_request(request)
     params = request.json_body
     stack_id = request.matchdict["stack_id"]
@@ -336,7 +364,11 @@ def run_workflow(request):
 # SEC FIXME document permission checks
 @view_config(route_name='api_v1_stack', request_method='DELETE', renderer='json')
 def delete_stack(request):
-    """Start a template job to run the template"""
+    """
+    Tags: orchestration
+    ---
+    Start a template job to run the template
+    """
     auth_context = auth_context_from_request(request)
     params = params_from_request(request)
     stack_id = request.matchdict["stack_id"]
@@ -362,7 +394,11 @@ def delete_stack(request):
 # SEC TODO add required permissions to docstring
 @view_config(route_name='api_v1_stack', request_method='GET', renderer='json')
 def show_stack(request):
-    """Start a template job to run the template"""
+    """
+    Tags: orchestration
+    ---
+    Start a template job to run the template
+    """
     auth_context = auth_context_from_request(request)
     params = params_from_request(request)
     stack_id = request.matchdict["stack_id"]
