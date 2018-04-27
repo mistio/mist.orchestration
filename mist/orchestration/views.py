@@ -315,13 +315,14 @@ def create_stack(request):
 
     ret = stack.as_dict()
 
+    if stack_tags:
+        add_tags_to_resource(auth_context.owner, stack, stack_tags)
+        stack.save()
+
     job_id = methods.run_workflow(auth_context, stack,
                                   "install", inputs)
     if job_id:
         ret['job_id'] = job_id
-
-    if stack_tags:
-        add_tags_to_resource(auth_context.owner, stack, stack_tags)
 
     # SEC
     auth_context.org.mapper.update(stack)
