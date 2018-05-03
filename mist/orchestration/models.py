@@ -40,6 +40,9 @@ class Template(me.Document):
 
     setuid = me.BooleanField(default=False)
 
+    owned_by = me.ReferenceField('User', reverse_delete_rule=me.NULLIFY)
+    created_by = me.ReferenceField('User', reverse_delete_rule=me.NULLIFY)
+
     meta = {
         'indexes': [
             {
@@ -63,6 +66,8 @@ class Template(me.Document):
         s = json.loads(self.to_json())
         s["id"] = self.id
         s["created_at"] = str(self.created_at)
+        s['owned_by'] = self.owned_by.id if self.owned_by else '',
+        s['created_by'] = self.created_by.id if self.created_by else '',
         return s
 
 
@@ -87,6 +92,9 @@ class Stack(me.Document):
     # keeping here for backwards compatibility.
     job_id = me.StringField()
     deleted = me.DateTimeField()
+
+    owned_by = me.ReferenceField('User', reverse_delete_rule=me.NULLIFY)
+    created_by = me.ReferenceField('User', reverse_delete_rule=me.NULLIFY)
 
     meta = {
         'strict': False,
@@ -126,6 +134,8 @@ class Stack(me.Document):
         s.pop('container_id', None)
         s["id"] = self.id
         s["created_at"] = str(self.created_at)
+        s['owned_by'] = self.owned_by.id if self.owned_by else '',
+        s['created_by'] = self.created_by.id if self.created_by else '',
         return s
 
     def __str__(self):

@@ -107,6 +107,10 @@ def add_template(request):
     except Exception as e:
         raise TemplateParseError(e.message.split('}')[-1].strip())
 
+    # Set ownership.
+    template.owned_by = template.created_by = auth_context.user
+    auth_context.user.get_ownership_mapper(auth_context.owner).update(template)
+
     # Attempt to save.
     try:
         template.save()
@@ -312,6 +316,10 @@ def create_stack(request):
         inputs['mist_uri'] = config.CORE_URI
 
     stack.deploy = deploy
+
+    # Set ownership.
+    stack.owned_by = stack.created_by = auth_context.user
+    auth_context.user.get_ownership_mapper(auth_context.owner).update(stack)
 
     ret = stack.as_dict()
 
