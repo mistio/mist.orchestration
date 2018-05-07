@@ -414,3 +414,180 @@ def show_stack(request):
     inputs = params.get("inputs", {})
 
     return stack.as_dict()
+
+
+# SEC
+@view_config(route_name='template_tags', request_method='GET', renderer='json')
+def get_template_tags(request):
+    """
+    List tags of a template
+    READ permission required on TEMPLATE
+    ---
+    template_id:
+      in: path
+      required: true
+      type: string
+    """
+    auth_context = auth_context_from_request(request)
+    template_id = request.matchdict["template_id"]
+
+    # SEC require READ permission on template
+    auth_context.check_perm('template', 'read', template_id)
+
+    return resolve_id_and_get_tags(auth_context.owner, 'template', template_id)
+
+
+# SEC
+@view_config(route_name='stack_tags', request_method='GET', renderer='json')
+def get_stack_tags(request):
+    """
+    List tags of a stack
+    READ permission required on STACK
+    ---
+    stack_id:
+      in: path
+      required: true
+      type: string
+    """
+    auth_context = auth_context_from_request(request)
+    stack_id = request.matchdict["stack_id"]
+
+    # SEC require READ permission on stack
+    auth_context.check_perm('stack', 'read', stack_id)
+
+    return resolve_id_and_get_tags(auth_context.owner, 'stack', stack_id)
+
+
+# SEC
+@view_config(route_name='template_tags', request_method='POST',
+             renderer='json')
+def set_template_tags(request):
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    template_id = request.matchdict["template_id"]
+
+    # SEC require EDIT_TAGS permission on template
+    auth_context.check_perm("template", "edit_tags", template_id)
+
+    from mist.orchestration.models import Template
+    try:
+        template = Template.objects.get(owner=auth_context.owner,
+                                        id=template_id, deleted=None)
+    except Template.DoesNotExist:
+        raise NotFoundError('Resource with that id does not exist')
+
+    tags = params.get("tags")
+    if type(tags) != dict:
+        raise BadRequestError('tags should be dictionary of tags')
+
+    if not modify_security_tags(auth_context, tags, template):
+        raise auth_context._raise('template', 'edit_security_tags')
+
+    return add_tags_to_resource(auth_context.owner, template, tags.items())
+
+
+# SEC
+@view_config(route_name='stack_tags', request_method='POST', renderer='json')
+def set_stack_tags(request):
+    """
+    Set tags on a machine
+    Set tags for a machine, given the cloud and machine id.
+    READ permission required on cloud.
+    EDIT_TAGS permission required on machine.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      type: string
+    machine_id:
+      in: path
+      required: true
+      type: string
+    tags:
+      items:
+        type: object
+      type: array
+    """
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    stack_id = request.matchdict["stack_id"]
+
+    # SEC require EDIT_TAGS permission on stack
+    auth_context.check_perm("stack", "edit_tags", stack_id)
+
+    from mist.orchestration.models import Stack
+    try:
+        stack = Stack.objects.get(owner=auth_context.owner,
+                                  id=stack_id, deleted=None)
+    except Stack.DoesNotExist:
+        raise NotFoundError('Resource with that id does not exist')
+
+    tags = params.get("tags")
+    if type(tags) != dict:
+        raise BadRequestError('tags should be dictionary of tags')
+
+    if not modify_security_tags(auth_context, tags, stack):
+        raise auth_context._raise('stack', 'edit_security_tags')
+
+    return add_tags_to_resource(auth_context.owner, stack, tags.items())
+
+
+# SEC
+@view_config(route_name='template_tag', request_method='DELETE',
+             renderer='json')
+def delete_template_tag(request):
+    """
+    Delete a tag
+    Delete tag in the db for specified resource_type.
+    EDIT_TAGS permission required on template.
+    ---
+    tag_key:
+      in: path
+      required: true
+      type: string
+    template_id:
+      in: path
+      required: true
+      type: string
+    """
+    auth_context = auth_context_from_request(request)
+    template_id = request.matchdict["template_id"]
+    tag_key = request.matchdict["tag_key"]
+
+    # SEC require EDIT_TAGS permission on template
+    auth_context.check_perm('template', 'edit_tags', template_id)
+    if not delete_security_tag(auth_context, tag_key):
+        raise auth_context._raise('template', 'edit_security_tags')
+
+    return resolve_id_and_delete_tags(auth_context.owner, 'template',
+                                      template_id, tags=[tag_key])
+
+
+# SEC
+@view_config(route_name='stack_tag', request_method='DELETE', renderer='json')
+def delete_stack_tag(request):
+    """
+    Delete a tag
+    Delete tag in the db for specified resource_type.
+    EDIT_TAGS permission required on stack.
+    ---
+    tag_key:
+      in: path
+      required: true
+      type: string
+    stack_id:
+      in: path
+      required: true
+      type: string
+    """
+    auth_context = auth_context_from_request(request)
+    stack_id = request.matchdict["stack_id"]
+    tag_key = request.matchdict["tag_key"]
+
+    # SEC require EDIT_TAGS permission on stack
+    auth_context.check_perm('stack', 'edit_tags', stack_id)
+    if not delete_security_tag(auth_context, tag_key):
+        raise auth_context._raise('stack', 'edit_security_tags')
+
+    return resolve_id_and_delete_tags(auth_context.owner, 'stack', stack_id,
+                                      tags=[tag_key])
