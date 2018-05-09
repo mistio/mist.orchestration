@@ -18,6 +18,9 @@ from mist.api.exceptions import ConflictError
 
 from mist.api.tag.models import Tag
 from mist.api.tag.methods import add_tags_to_resource
+from mist.api.tag.methods import resolve_id_and_delete_tags
+from mist.api.tag.methods import modify_security_tags
+from mist.api.tag.methods import delete_security_tag
 
 from mist.api.logs.methods import get_stories
 
