@@ -386,7 +386,6 @@ def delete_stack(request):
     ret = {}
     ret["job_id"] = methods.run_workflow(auth_context, stack,
                                          "uninstall", inputs)
-    stack.update(set__deleted=datetime.datetime.utcnow())
     trigger_session_update(auth_context.owner, ['stacks'])
 
     return ret
