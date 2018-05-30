@@ -108,8 +108,7 @@ def add_template(request):
         raise TemplateParseError(e.message.split('}')[-1].strip())
 
     # Set ownership.
-    template.owned_by = template.created_by = auth_context.user
-    auth_context.user.get_ownership_mapper(auth_context.owner).update(template)
+    template.assign_to(auth_context.user)
 
     # Attempt to save.
     try:
@@ -318,8 +317,7 @@ def create_stack(request):
     stack.deploy = deploy
 
     # Set ownership.
-    stack.owned_by = stack.created_by = auth_context.user
-    auth_context.user.get_ownership_mapper(auth_context.owner).update(stack)
+    stack.assign_to(auth_context.user)
 
     ret = stack.as_dict()
 
