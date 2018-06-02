@@ -59,11 +59,15 @@ class Template(OwnershipMixin, me.Document):
         super(Template, self).delete()
         Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
+        if self.owned_by:
+            self.owned_by.get_ownership_mapper(self.owner).remove(self)
 
     def as_dict(self):
         s = json.loads(self.to_json())
         s["id"] = self.id
         s["created_at"] = str(self.created_at)
+        s["owned_by"] = self.owned_by.id if self.owned_by else ""
+        s["created_by"] = self.created_by.id if self.created_by else ""
         return s
 
 
@@ -121,12 +125,16 @@ class Stack(OwnershipMixin, me.Document):
         super(Stack, self).delete()
         Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
+        if self.owned_by:
+            self.owned_by.get_ownership_mapper(self.owner).remove(self)
 
     def as_dict(self):
         s = json.loads(self.to_json())
         s.pop('container_id', None)
         s["id"] = self.id
         s["created_at"] = str(self.created_at)
+        s["owned_by"] = self.owned_by.id if self.owned_by else ""
+        s["created_by"] = self.created_by.id if self.created_by else ""
         return s
 
     def __str__(self):
