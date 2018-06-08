@@ -107,6 +107,9 @@ def add_template(request):
     except Exception as e:
         raise TemplateParseError(e.message.split('}')[-1].strip())
 
+    # Set ownership.
+    template.assign_to(auth_context.user)
+
     # Attempt to save.
     try:
         template.save()
@@ -312,6 +315,9 @@ def create_stack(request):
         inputs['mist_uri'] = config.CORE_URI
 
     stack.deploy = deploy
+
+    # Set ownership.
+    stack.assign_to(auth_context.user)
 
     ret = stack.as_dict()
 
