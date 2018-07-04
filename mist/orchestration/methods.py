@@ -165,8 +165,15 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
 
         log.info("docker run %s %s" % (job_id, " ".join(wparams)))
 
+        # Set the list of ENVs to pass to the container.
+        # 1. MIST_GIT_CLONE_COMMAND is the git-clone command that will be used
+        #    by the container to clone the Git repo. Since the Git URL may
+        #    include Basic Auth, we do not want to have it returned by the API.
+        # 2. TODO
+        env = ['MIST_GIT_CLONE_COMMAND=%s' % stack.template.git_clone_command]
+
         container = docker_run(name='orchestration-workflow-%s' % job_id,
-                               command=' '.join(wparams))
+                               env=env, command=' '.join(wparams))
 
         stack.container_id = container.id
         # TODO deprecate container_id, store it in model
@@ -260,39 +267,10 @@ def get_workflows(parsed):
 def analyze_template(template):
     if template.exec_type == 'cloudify':
         if template.location_type == 'github':
-            repo = template.template.replace("https://github.com/", "")
-            repo = repo.split('tree/')
-            if len(repo) > 1:
-                branch = repo[1]
-            else:
-                branch = "master"
-            repo = repo[0]
-            if repo.endswith("/"):
-                repo = repo.rstrip("/")
-            sha_path = 'https://api.github.com/repos/%s/commits' % repo
-            token = config.GITHUB_BOT_TOKEN
-            if token:
-                headers = {'Authorization': 'token %s' % token}
-            else:
-                headers = {}
-            resp = requests.get(sha_path, headers=headers)
-            resp = resp.json()
-            # latest_sha = resp[0]["sha"]
-            tarball_path = 'https://api.github.com/repos/%s/tarball/%s' % (repo, branch)
-            resp = requests.get(tarball_path, headers=headers,
-                                allow_redirects=False)
-            if resp.ok and resp.is_redirect and 'location' in resp.headers:
-                path = resp.headers['location']
-            else:
-                raise Exception("Couldn't download git project")
-
-            tmpdir = tempfile.mkdtemp()
-            os.chdir(tmpdir)
-            # from run_script import download, unpack, find_path
-            path = download(path)
-            unpack(path, tmpdir)
-            path = find_path(tmpdir, template.entrypoint)
-            parsed = parser.parse_from_path(path)
+            with io_helpers.get_cloned_git_path(template.git_repo,
+                                                template.git_branch) as tmpdir:
+                path = find_path(tmpdir, template.entrypoint)
+                parsed = parser.parse_from_path(path)
         elif template.location_type == 'url':
             tmpdir = tempfile.mkdtemp()
             os.chdir(tmpdir)
