@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import json
-
+import urlparse
 import mongoengine as me
 
 from mist.api.tag.models import Tag
@@ -52,6 +52,48 @@ class Template(OwnershipMixin, me.Document):
         ],
     }
 
+    @property
+    def git_repo(self):
+        """Return the URL to the Git repository, if applicable.
+
+        The output of this property SHOULD NOT be exposed publicly, since the
+        Git URL may include the user's password in the form of Basic Auth.
+
+        """
+        if self.location_type == "github":
+            return self.template.split("/tree/")[0]
+        return ""
+
+    @property
+    def git_branch(self):
+        """Return the branch of the Git repository, if applicable."""
+        if self.location_type == "github":
+            repo_n_branch = self.template.split("/tree/")
+            return "master" if len(repo_n_branch) is 1 else repo_n_branch[1]
+        return ""
+
+    @property
+    def git_clone_command(self):
+        """Return the git-clone command used to clone self.
+
+        This property will return an empty string if `self.location_type` is
+        not `github`. Note that git-clone can be used to clone the Template's
+        repository from any Git server, not just Github.
+
+        If `self.location_type` is `github`, then the expected URL stored in
+        the `template` field should be:
+
+        https://[user:pass@]<git-server-url>/<owner>/<repo>[/tree/<branch>]
+
+        By default, the HEAD of the master branch is cloned, unless a specific
+        branch has been requested.
+
+        """
+        if self.location_type == "github":
+            return "git clone --branch %s --depth 1 %s" % (self.git_branch,
+                                                           self.git_repo)
+        return ""
+
     def touch(self):
         self.last_used_at = datetime.utcnow()
 
@@ -68,6 +110,13 @@ class Template(OwnershipMixin, me.Document):
         s["created_at"] = str(self.created_at)
         s["owned_by"] = self.owned_by.id if self.owned_by else ""
         s["created_by"] = self.created_by.id if self.created_by else ""
+
+        # Hide basic auth password.
+        if self.location_type == "github":
+            password = urlparse.urlparse(self.template).password
+            if password:
+                s["template"] = self.template.replace(password, "*password*")
+
         return s
 
 
