@@ -155,7 +155,25 @@ class Stack(OwnershipMixin, me.Document):
         ],
     }
 
+    @property
+    def is_uninstalled(self):
+        """Return True if self has been uninstalled or never installed."""
+        if self.workflows:
+            return (self.workflows[-1].get('name') == 'uninstall' and not
+                    self.workflows[-1].get('error'))
+        return True
+
     def clean(self):
+        # If the Stack is not installed, make sure `self.node_instances` are
+        # re-set to []. This prevents left-over node instances from showing
+        # up in the UI, when the Stack has been uninstalled. It also ensures
+        # that we start off with a clean slate when re-installing the Stack.
+        # The `outputs` and `machines` fields are also reset, since commands
+        # will no longer yield any results and references to Machine objects
+        # may be `DBRefs`.
+        if self.is_uninstalled:
+            self.outputs, self.machines, self.node_instances = {}, [], []
+
         if self.node_instances:
             for instance in self.node_instances:
                 cloud_id = instance["runtime_properties"].get("cloud_id")
