@@ -160,7 +160,7 @@ class Stack(OwnershipMixin, me.Document):
         """Return True if self has been uninstalled or never installed."""
         if self.workflows:
             return (self.workflows[-1].get('name') == 'uninstall' and not
-                    self.workflows[-1].get('error'))
+                    self.workflows[-1].get('error') and self.status == 'ok')
         return True
 
     def clean(self):
