@@ -300,16 +300,19 @@ def create_stack(request):
     if 'mist_tags' in inputs:
         tags = inputs.get('mist_tags', {})
         if not isinstance(tags, dict):
-            if not (isinstance(tags, list) and
-                    all((isinstance(t, dict) and len(t) is 1 for t in tags))):
-                raise BadRequestError('Expecting a dictionary of tags or a '
-                                      'list of single-item dictionaries')
+            if not isinstance(tags, list):
+                raise BadRequestError('Expecting a dictionary or list of tags')
+            if not all(isinstance(t, dict) and len(t) is 1 for t in tags):
+                raise BadRequestError('The list of tags should consist of '
+                                      'single-item dictionaries')
             tags = {key: value for t in tags for key, value in t.iteritems()}
-        tags.update({
-            t.key: t.value for
-            t in Tag.objects(owner=auth_context.owner, resource=template)
-        })
+
+        tags.update({t.key: t.value for t in Tag.objects(resource=template)})
         inputs['mist_tags'] = tags
+
+        for i in inputs:
+            if i.startswith('mist_machine') and tags:
+                inputs[i]['tags'] = tags
 
     if 'mist_uri' in template_inputs:
         inputs['mist_uri'] = config.CORE_URI
