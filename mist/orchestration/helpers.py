@@ -1,7 +1,9 @@
 import os
 import glob
 import copy
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import tarfile
 import zipfile
 import logging
