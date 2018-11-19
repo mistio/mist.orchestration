@@ -5,6 +5,8 @@ import logging
 
 import requests
 
+from functools import cmp_to_key
+
 import mongoengine as me
 
 import dsl_parser.parser as parser
@@ -302,6 +304,8 @@ def form_inputs(inputs):
         })
 
     def input_cmp(a, b):
+        def cmp(a, b):
+            return (a > b) - (a < b)
         if 'mist_cloud' in a['name']:
             return -1
         if 'mist_cloud' in b['name']:
@@ -332,5 +336,4 @@ def form_inputs(inputs):
             if 'size' in a['name'] and 'size' not in b['name']:
                 return -1
         return cmp(a['name'], b['name'])
-
-    return sorted(ret, input_cmp)
+    return sorted(ret, key=cmp_to_key(input_cmp))
