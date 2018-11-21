@@ -105,7 +105,7 @@ def add_template(request):
     try:
         template = methods.analyze_template(template)
     except Exception as e:
-        raise TemplateParseError(e.message.split('}')[-1].strip())
+        raise TemplateParseError(str(e).split('}')[-1].strip())
 
     # Set ownership.
     template.assign_to(auth_context.user)
