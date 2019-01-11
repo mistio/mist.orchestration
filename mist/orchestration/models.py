@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import json
-import urlparse
+import urllib.parse
 import mongoengine as me
 
 from mist.api.tag.models import Tag
@@ -113,7 +113,7 @@ class Template(OwnershipMixin, me.Document):
 
         # Hide basic auth password.
         if self.location_type == "github":
-            password = urlparse.urlparse(self.template).password
+            password = urllib.parse.urlparse(self.template).password
             if password:
                 s["template"] = self.template.replace(password, "*password*")
 

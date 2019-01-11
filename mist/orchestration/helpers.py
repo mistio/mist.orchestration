@@ -1,7 +1,9 @@
 import os
 import glob
 import copy
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 import tarfile
 import zipfile
 import logging
@@ -17,7 +19,7 @@ log = logging.getLogger(__name__)
 def download(url, path=None):
     """Download a file over HTTP"""
     log.debug("Downloading %s.", url)
-    name, headers = urllib.urlretrieve(url, path)
+    name, headers = urllib.request.urlretrieve(url, path)
     log.debug("Downloaded to %s.", name)
     return name
 
@@ -33,7 +35,7 @@ def unpack(path, dirname='.'):
             for tarinfo in tfile:
                 if tarinfo.isdir():
                     tarinfo = copy.copy(tarinfo)
-                    tarinfo.mode = 0700
+                    tarinfo.mode = 0o700
                 tfile.extract(tarinfo, dirname)
     elif zipfile.is_zipfile(path):
         log.debug("Unpacking '%s' zip archive in directory '%s'.",

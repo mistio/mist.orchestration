@@ -105,7 +105,7 @@ def add_template(request):
     try:
         template = methods.analyze_template(template)
     except Exception as e:
-        raise TemplateParseError(e.message.split('}')[-1].strip())
+        raise TemplateParseError(str(e).split('}')[-1].strip())
 
     # Set ownership.
     template.assign_to(auth_context.user)
@@ -130,7 +130,7 @@ def add_template(request):
     # explicitly, if not invoked from within add_tags_to_resource. WTF!
     if required_tags:
         add_tags_to_resource(auth_context.owner, template,
-                             required_tags.items())
+                             list(required_tags.items()))
     else:
         trigger_session_update(auth_context.owner, ['templates'])
 
@@ -305,7 +305,7 @@ def create_stack(request):
             if not all(isinstance(t, dict) and len(t) is 1 for t in tags):
                 raise BadRequestError('The list of tags should consist of '
                                       'single-item dictionaries')
-            tags = {key: value for t in tags for key, value in t.iteritems()}
+            tags = {key: value for t in tags for key, value in t.items()}
 
         tags.update({t.key: t.value for t in Tag.objects(resource=template)})
         inputs['mist_tags'] = tags

@@ -1,1 +1,1 @@
-cloudify-dsl-parser==3.4.1
+https://github.com/mistio/cloudify-dsl-parser/archive/master.zip
