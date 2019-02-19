@@ -72,15 +72,15 @@ def docker_run(name, env=None, command=None):
         if config.DOCKER_TLS_KEY and config.DOCKER_TLS_CERT:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = tempfile.NamedTemporaryFile(delete=False)
-            key_temp_file.write(config.DOCKER_TLS_KEY)
+            key_temp_file.write(config.DOCKER_TLS_KEY.encode())
             key_temp_file.close()
             cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
-            cert_temp_file.write(config.DOCKER_TLS_CERT)
+            cert_temp_file.write(config.DOCKER_TLS_CERT.encode())
             cert_temp_file.close()
             if config.DOCKER_TLS_CA:
                 # docker started with tlsverify
                 ca_cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
-                ca_cert_temp_file.write(config.DOCKER_TLS_CA)
+                ca_cert_temp_file.write(config.DOCKER_TLS_CA.encode())
                 ca_cert_temp_file.close()
             driver = get_container_driver(Container_Provider.DOCKER)
             conn = driver(host=config.DOCKER_IP,
