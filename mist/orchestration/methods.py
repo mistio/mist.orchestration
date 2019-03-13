@@ -159,7 +159,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
             stack.save()
         except me.ValidationError as err:
             log.error('Error saving %s: %s', stack, err.to_dict())
-            raise BadRequestError({'msg': err.message,
+            raise BadRequestError({'msg': str(err),
                                 'errors': err.to_dict()})
         except me.NotUniqueError as err:
             log.error('%s is not unique: %s', stack, err)
@@ -200,7 +200,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
         stack.save()
     except me.ValidationError as err:
         log.error('Error saving %s: %s', stack, err.to_dict())
-        raise BadRequestError({'msg': err.message,
+        raise BadRequestError({'msg': str(err),
                                'errors': err.to_dict()})
     except me.NotUniqueError as err:
         log.error('%s is not unique: %s', stack, err)
@@ -246,7 +246,7 @@ def finish_workflow(stack, job_id, workflow, exit_code, cmdout, error,
         stack.save()
     except me.ValidationError as err:
         log.error('Error saving %s: %s', stack, err.to_dict())
-        raise BadRequestError({'msg': err.message,
+        raise BadRequestError({'msg': str(err),
                                'errors': err.to_dict()})
     except me.NotUniqueError as err:
         log.error('%s is not unique: %s', stack, err)

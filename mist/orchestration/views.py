@@ -115,7 +115,7 @@ def add_template(request):
         template.save()
     except me.ValidationError as err:
         log.error('Error saving %s: %s', template, err.to_dict())
-        raise BadRequestError({'msg': err.message,
+        raise BadRequestError({'msg': str(err),
                                'errors': err.to_dict()})
     except me.NotUniqueError as err:
         log.error('%s is not unique: %s', template, err)
