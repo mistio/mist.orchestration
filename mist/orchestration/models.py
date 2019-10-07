@@ -24,7 +24,7 @@ class Template(OwnershipMixin, me.Document):
     name = me.StringField()
     description = me.StringField()
 
-    owner = me.ReferenceField(Owner)
+    owner = me.ReferenceField(Owner, reverse_delete_rule=me.CASCADE)
 
     # exec_type must be in ('executable', 'ansible', 'collectd_python_plugin')
     exec_type = me.StringField()
@@ -125,17 +125,19 @@ class Stack(OwnershipMixin, me.Document):
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
     created_at = me.DateTimeField(default=datetime.utcnow)
-    owner = me.ReferenceField(Owner, required=True)
+    owner = me.ReferenceField(Owner, required=True,
+                              reverse_delete_rule=me.CASCADE)
     name = me.StringField(required=True)
     description = me.StringField()
     status = me.StringField()
     inputs = me.DictField()
     outputs = me.DictField(default={})
     node_instances = me.ListField()
-    machines = me.ListField(me.ReferenceField(Machine))
+    machines = me.ListField(
+        me.ReferenceField(Machine, reverse_delete_rule=me.PULL))
     container_id = me.StringField()
     workflows = me.ListField(me.DictField())
-    template = me.ReferenceField(Template)
+    template = me.ReferenceField(Template, reverse_delete_rule=me.NULLIFY)
     deploy = me.BooleanField(default=False)
     # TODO: This field should be deprecated eventually
     # keeping here for backwards compatibility.
