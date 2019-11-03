@@ -100,7 +100,7 @@ def add_template(request):
             raise RequiredParameterMissingError('template_inline')
         kwargs['template'] = params.get('template_inline')
 
-    required_tags = auth_context.check_perm('template', 'add', None)
+    required_tags, _ = auth_context.check_perm('template', 'add', None)
     template = Template(owner=auth_context.owner, **kwargs)
     try:
         template = methods.analyze_template(template)
@@ -269,7 +269,7 @@ def create_stack(request):
     auth_context = auth_context_from_request(request)
 
     # SEC
-    stack_tags = auth_context.check_perm("stack", "create", None)
+    stack_tags, _ = auth_context.check_perm('stack', 'create', None)
 
     params = request.json_body
     template_id = params.get('template_id')
