@@ -307,7 +307,8 @@ def create_stack(request):
                                       'single-item dictionaries')
             tags = {key: value for t in tags for key, value in t.items()}
 
-        tags.update({t.key: t.value for t in Tag.objects(resource=template)})
+        tags.update({t.key: t.value for t in Tag.objects(
+            resource_type='template', resource_id=template.id)})
         inputs['mist_tags'] = tags
 
         for i in inputs:
