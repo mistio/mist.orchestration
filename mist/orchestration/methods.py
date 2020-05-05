@@ -17,6 +17,8 @@ from libcloud.container.base import ContainerImage
 
 from mist.api import helpers as io_helpers
 
+from mist.api.mongoengine_extras import escape_dots_and_dollars_from_dict
+
 from mist.api.auth.models import ApiToken
 
 from mist.api.tag.methods import add_tags_to_resource, get_tags_for_resource
@@ -220,6 +222,7 @@ def finish_workflow(stack, job_id, workflow, exit_code, cmdout, error,
 
     # Update node instances.
     if node_instances is not None:
+        node_instances = escape_dots_and_dollars_from_dict(node_instances)
         stack.node_instances = node_instances
 
     if outputs:
