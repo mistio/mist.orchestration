@@ -11,6 +11,7 @@ from mist.api.users.models import Owner
 from mist.api.machines.models import Machine
 from mist.api.clouds.models import Cloud
 from mist.api.ownership.mixins import OwnershipMixin
+from mist.api.mongoengine_extras import MistDictField, MistListField
 
 
 class CloudifyContext(me.EmbeddedDocument):
@@ -35,8 +36,8 @@ class Template(OwnershipMixin, me.Document):
     created_at = me.DateTimeField(default=datetime.utcnow)
     last_used_at = me.DateTimeField()
     versions = me.ListField(me.StringField) # git sha's
-    workflows = me.ListField()
-    inputs = me.ListField()
+    workflows = MistListField()
+    inputs = MistListField()
     deleted = me.DateTimeField()
 
     setuid = me.BooleanField(default=False)
@@ -121,7 +122,7 @@ class Template(OwnershipMixin, me.Document):
 
 
 class Stack(OwnershipMixin, me.Document):
-    """The basic Script Model."""
+    """The basic Stack Model."""
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
     created_at = me.DateTimeField(default=datetime.utcnow)
@@ -130,13 +131,13 @@ class Stack(OwnershipMixin, me.Document):
     name = me.StringField(required=True)
     description = me.StringField()
     status = me.StringField()
-    inputs = me.DictField()
-    outputs = me.DictField(default={})
-    node_instances = me.ListField()
+    inputs = MistDictField()
+    outputs = MistDictField(default={})
+    node_instances = MistListField()
     machines = me.ListField(
         me.ReferenceField(Machine, reverse_delete_rule=me.PULL))
     container_id = me.StringField()
-    workflows = me.ListField(me.DictField())
+    workflows = MistListField(me.DictField())
     template = me.ReferenceField(Template, reverse_delete_rule=me.NULLIFY)
     deploy = me.BooleanField(default=False)
     # TODO: This field should be deprecated eventually
