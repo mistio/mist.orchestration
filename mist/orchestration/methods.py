@@ -11,11 +11,9 @@ import mongoengine as me
 
 import dsl_parser.parser as parser
 
-from libcloud.container.types import Provider as Container_Provider
-from libcloud.container.providers import get_driver as get_container_driver
-from libcloud.container.base import ContainerImage
-
 from mist.api import helpers as io_helpers
+
+from mist.api.helpers import docker_run
 
 from mist.api.mongoengine_extras import escape_dots_and_dollars_from_dict
 
@@ -25,7 +23,6 @@ from mist.api.tag.methods import add_tags_to_resource, get_tags_for_resource
 
 from mist.orchestration.helpers import download, unpack, find_path
 from mist.orchestration.models import Template, Stack
-from mist.orchestration.exceptions import WorkflowExecutionError
 
 from mist.api.exceptions import BadRequestError
 from mist.api.exceptions import ConflictError
@@ -40,6 +37,7 @@ if config.HAS_RBAC:
 
 log = logging.getLogger(__name__)
 
+CLOUDIFY_MIST_PLUGIN_IMAGE = "mist/cloudify-mist-plugin:latest"
 
 # SEC
 def filter_list_templates(auth_context):
@@ -67,42 +65,6 @@ def filter_list_stacks(auth_context):
         sdict['tags'] = get_tags_for_resource(auth_context.owner, stack)
         stacks.append(sdict)
     return stacks
-
-
-def docker_run(name, env=None, command=None):
-    try:
-        if config.DOCKER_TLS_KEY and config.DOCKER_TLS_CERT:
-            # tls auth, needs to pass the key and cert as files
-            key_temp_file = tempfile.NamedTemporaryFile(delete=False)
-            key_temp_file.write(config.DOCKER_TLS_KEY.encode())
-            key_temp_file.close()
-            cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
-            cert_temp_file.write(config.DOCKER_TLS_CERT.encode())
-            cert_temp_file.close()
-            if config.DOCKER_TLS_CA:
-                # docker started with tlsverify
-                ca_cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
-                ca_cert_temp_file.write(config.DOCKER_TLS_CA.encode())
-                ca_cert_temp_file.close()
-            driver = get_container_driver(Container_Provider.DOCKER)
-            conn = driver(host=config.DOCKER_IP,
-                          port=config.DOCKER_PORT,
-                          key_file=key_temp_file.name,
-                          cert_file=cert_temp_file.name,
-                          ca_cert=ca_cert_temp_file.name)
-        else:
-            driver = get_container_driver(Container_Provider.DOCKER)
-            conn = driver(host=config.DOCKER_IP, port=config.DOCKER_PORT)
-        image_id = "mist/cloudify-mist-plugin:latest"
-        image = ContainerImage(id=image_id, name=image_id,
-                               extra={}, driver=conn, path=None,
-                               version=None)
-        node = conn.deploy_container(name, image, environment=env,
-                                     command=command, tty=True)
-    except Exception as err:
-        raise WorkflowExecutionError(str(err))
-
-    return node
 
 
 def run_workflow(auth_context, stack, workflow, inputs=None):
@@ -177,6 +139,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
         env = ['MIST_GIT_CLONE_COMMAND=%s' % stack.template.git_clone_command]
 
         container = docker_run(name='orchestration-workflow-%s' % job_id,
+                               image_id=CLOUDIFY_MIST_PLUGIN_IMAGE,
                                env=env, command=' '.join(wparams))
 
         stack.container_id = container.id
