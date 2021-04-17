@@ -21,6 +21,7 @@ from mist.api.auth.models import ApiToken
 
 from mist.api.tag.methods import add_tags_to_resource, get_tags_for_resource
 
+from mist.orchestration.config import CLOUDIFY_MIST_PLUGIN_IMAGE
 from mist.orchestration.helpers import download, unpack, find_path
 from mist.orchestration.models import Template, Stack
 
@@ -36,8 +37,6 @@ if config.HAS_RBAC:
     from mist.rbac.tokens import SuperToken
 
 log = logging.getLogger(__name__)
-
-CLOUDIFY_MIST_PLUGIN_IMAGE = "mist/cloudify-mist-plugin:latest"
 
 # SEC
 def filter_list_templates(auth_context):
