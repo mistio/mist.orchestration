@@ -70,13 +70,12 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
 
     if inputs:
         stack.inputs.update({workflow: inputs})
-    job_id = None
+
+    stack.job_id = job_id = uuid.uuid4().hex
 
     if stack.deploy:
 
         auth_context.check_perm('stack', 'run_workflow', stack.id)
-
-        job_id = uuid.uuid4().hex
 
         # Create API Token. Generate SuperToken, if appropriate.
         token_cls = ApiToken
@@ -101,8 +100,6 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
             stack.status = "start_creation"
         else:
             stack.status = 'workflow_started'
-
-        stack.job_id = job_id
 
         try:
             wparams = [stack.id]
