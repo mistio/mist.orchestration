@@ -184,9 +184,9 @@ class Stack(OwnershipMixin, me.Document):
                 if cloud_id and machine_id:
                     cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
                                               deleted=None)
-                    machine = Machine.objects(cloud=cloud, machine_id=machine_id).first()
+                    machine = Machine.objects(cloud=cloud, external_id=machine_id).first()
                     if not machine:
-                        machine = Machine(cloud=cloud, machine_id=machine_id)
+                        machine = Machine(cloud=cloud, external_id=machine_id)
                         machine.save()
                     if not (machine in self.machines):
                         self.machines.append(machine)
