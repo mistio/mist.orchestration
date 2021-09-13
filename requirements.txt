@@ -1,1 +1,1 @@
-https://github.com/mistio/cloudify-common/archive/master.zip
+https://github.com/mistio/cloudify-dsl-parser/archive/master.zip
