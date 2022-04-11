@@ -33,7 +33,7 @@ class Template(OwnershipMixin, me.Document):
     # (url, repo, source code, depending on location_type)
     template = me.StringField()
     entrypoint = me.StringField()  # used for url (if archive) and repos
-    created_at = me.DateTimeField(default=datetime.utcnow)
+    created = me.DateTimeField(default=datetime.utcnow)
     last_used_at = me.DateTimeField()
     versions = me.ListField(me.StringField) # git sha's
     workflows = MistListField()
@@ -108,7 +108,7 @@ class Template(OwnershipMixin, me.Document):
     def as_dict(self):
         s = json.loads(self.to_json())
         s["id"] = self.id
-        s["created_at"] = str(self.created_at)
+        s["created"] = str(self.created)
         s["owned_by"] = self.owned_by.id if self.owned_by else ""
         s["created_by"] = self.created_by.id if self.created_by else ""
 
@@ -125,7 +125,7 @@ class Stack(OwnershipMixin, me.Document):
     """The basic Stack Model."""
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
-    created_at = me.DateTimeField(default=datetime.utcnow)
+    created = me.DateTimeField(default=datetime.utcnow)
     owner = me.ReferenceField(Owner, required=True,
                               reverse_delete_rule=me.CASCADE)
     name = me.StringField(required=True)
@@ -184,9 +184,9 @@ class Stack(OwnershipMixin, me.Document):
                 if cloud_id and machine_id:
                     cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
                                               deleted=None)
-                    machine = Machine.objects(cloud=cloud, machine_id=machine_id).first()
+                    machine = Machine.objects(cloud=cloud, external_id=machine_id).first()
                     if not machine:
-                        machine = Machine(cloud=cloud, machine_id=machine_id)
+                        machine = Machine(cloud=cloud, external_id=machine_id)
                         machine.save()
                     if not (machine in self.machines):
                         self.machines.append(machine)
@@ -202,7 +202,7 @@ class Stack(OwnershipMixin, me.Document):
         s = json.loads(self.to_json())
         s.pop('container_id', None)
         s["id"] = self.id
-        s["created_at"] = str(self.created_at)
+        s["created"] = str(self.created)
         s["owned_by"] = self.owned_by.id if self.owned_by else ""
         s["created_by"] = self.created_by.id if self.created_by else ""
         return s
