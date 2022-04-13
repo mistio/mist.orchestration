@@ -5,20 +5,20 @@ from uuid import uuid4
 import json
 import urllib.parse
 import mongoengine as me
-
 from mist.api.tag.models import Tag
 from mist.api.users.models import Owner
 from mist.api.machines.models import Machine
 from mist.api.clouds.models import Cloud
 from mist.api.ownership.mixins import OwnershipMixin
 from mist.api.mongoengine_extras import MistDictField, MistListField
+from mist.api.tag.mixins import TagMixin
 
 
 class CloudifyContext(me.EmbeddedDocument):
     inputs = me.DictField()
 
 
-class Template(OwnershipMixin, me.Document):
+class Template(OwnershipMixin, me.Document, TagMixin):
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
 
@@ -49,7 +49,12 @@ class Template(OwnershipMixin, me.Document):
                 'sparse': False,
                 'unique': True,
                 'cls': False,
-            },
+            }, {
+                'fields': ['$tags'],
+                'default_language': 'english',
+                'sparse': True,
+                'unique': False
+            }
         ],
     }
 
@@ -121,7 +126,7 @@ class Template(OwnershipMixin, me.Document):
         return s
 
 
-class Stack(OwnershipMixin, me.Document):
+class Stack(OwnershipMixin, me.Document, TagMixin):
     """The basic Stack Model."""
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
@@ -154,7 +159,12 @@ class Stack(OwnershipMixin, me.Document):
                 'sparse': False,
                 'unique': True,
                 'cls': False,
-            },
+            }, {
+                'fields': ['$tags'],
+                'default_language': 'english',
+                'sparse': True,
+                'unique': False
+            }
         ],
     }
 
@@ -184,7 +194,8 @@ class Stack(OwnershipMixin, me.Document):
                 if cloud_id and machine_id:
                     cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
                                               deleted=None)
-                    machine = Machine.objects(cloud=cloud, external_id=machine_id).first()
+                    machine = Machine.objects(cloud=cloud,
+                                              external_id=machine_id).first()
                     if not machine:
                         machine = Machine(cloud=cloud, external_id=machine_id)
                         machine.save()
