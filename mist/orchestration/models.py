@@ -105,7 +105,7 @@ class Template(OwnershipMixin, me.Document, TagMixin):
 
     def delete(self):
         super(Template, self).delete()
-        Tag.objects(resource=self).delete()
+        Tag.objects(resource_id=self.id, resource_type='template').delete()
         self.owner.mapper.remove(self)
         if self.owned_by:
             self.owned_by.get_ownership_mapper(self.owner).remove(self)
@@ -204,7 +204,7 @@ class Stack(OwnershipMixin, me.Document, TagMixin):
 
     def delete(self):
         super(Stack, self).delete()
-        Tag.objects(resource=self).delete()
+        Tag.objects(resource_id=self.id, resource_type='stack').delete()
         self.owner.mapper.remove(self)
         if self.owned_by:
             self.owned_by.get_ownership_mapper(self.owner).remove(self)
