@@ -10,7 +10,7 @@ from mist.api.helpers import view_config
 from mist.orchestration import methods
 from mist.api.auth.methods import auth_context_from_request
 from mist.api.helpers import params_from_request
-from mist.api.exceptions import NotFoundError, UnauthorizedError
+from mist.api.exceptions import NotFoundError
 from mist.api.exceptions import RequiredParameterMissingError
 from mist.api.exceptions import BadRequestError
 from mist.api.exceptions import BadRequestError
@@ -129,7 +129,9 @@ def add_template(request):
     # even with an empty tags dict. A trigger_session_update needs to be called
     # explicitly, if not invoked from within add_tags_to_resource. WTF!
     if required_tags:
-        add_tags_to_resource(auth_context.owner, template,
+        add_tags_to_resource(auth_context.owner,
+                             [{'resource_type': 'template',
+                               'resource_id': template.id}],
                              list(required_tags.items()))
     else:
         trigger_session_update(auth_context.owner, ['templates'])
@@ -326,7 +328,10 @@ def create_stack(request):
     ret = stack.as_dict()
 
     if stack_tags:
-        add_tags_to_resource(auth_context.owner, stack, stack_tags)
+        add_tags_to_resource(auth_context.owner,
+                             [{'resource_type': 'stack',
+                               'resource_id': stack.id}],
+                             stack_tags)
         stack.save()
 
     job_id = methods.run_workflow(auth_context, stack,
