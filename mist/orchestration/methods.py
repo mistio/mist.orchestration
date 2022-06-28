@@ -73,7 +73,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
 
     stack.job_id = job_id = uuid.uuid4().hex
 
-    if stack.deploy:
+    if stack.deploy or workflow == 'uninstall':
 
         auth_context.check_perm('stack', 'run_workflow', stack.id)
 
