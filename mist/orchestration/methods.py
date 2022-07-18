@@ -110,7 +110,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
             wparams.append("-t")
             wparams.append(new_api_token.token)
             wparams.append("-u")
-            wparams.append(config.CORE_URI)
+            wparams.append(config.PORTAL_URI)
         except Exception as exc:
             log.error(str(exc))
             return False
