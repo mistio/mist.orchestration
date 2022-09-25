@@ -6,7 +6,7 @@ stages:
 
 flake8:
   stage: test
-  image: python:2.7-alpine
+  image: python:3.10-slim-bullseye
   before_script:
     - pip install flake8
   script:
