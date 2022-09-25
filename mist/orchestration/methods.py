@@ -92,7 +92,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
         new_api_token.name = "stack_{0}_{1}".format(stack.name, uuid.uuid4().hex)
         new_api_token.ttl = 3600
         new_api_token.set_user(auth_context.user)
-        new_api_token.org = auth_context.owner
+        new_api_token.orgs = [auth_context.org]
         new_api_token.save()
 
         inputs = inputs or stack.inputs.get(workflow)
