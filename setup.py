@@ -36,7 +36,7 @@ if os.path.exists(REQUIREMENTS_PATH):
 
 setup(
     name='mist.orchestration',
-    version='dev',
+    version='1.0',
     description='Mist orchestration plugin',
     long_description='%s\n\n%s' % (README, CHANGELOG),
     author='mist.io',
