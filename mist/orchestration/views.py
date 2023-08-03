@@ -316,7 +316,7 @@ def create_stack(request):
                 inputs[i]['tags'] = tags
 
     if 'mist_uri' in template_inputs:
-        inputs['mist_uri'] = config.CORE_URI
+        inputs['mist_uri'] = config.PORTAL_URI
 
     stack.deploy = deploy
 

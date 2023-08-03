@@ -73,7 +73,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
 
     stack.job_id = job_id = uuid.uuid4().hex
 
-    if stack.deploy:
+    if stack.deploy or workflow == 'uninstall':
 
         auth_context.check_perm('stack', 'run_workflow', stack.id)
 
@@ -110,7 +110,7 @@ def run_workflow(auth_context, stack, workflow, inputs=None):
             wparams.append("-t")
             wparams.append(new_api_token.token)
             wparams.append("-u")
-            wparams.append(config.CORE_URI)
+            wparams.append(config.PORTAL_URI)
         except Exception as exc:
             log.error(str(exc))
             return False
@@ -229,28 +229,7 @@ def get_workflows(parsed):
 
 
 def analyze_template(template):
-    # if template.exec_type == 'cloudify':
-    #     if template.location_type == 'github':
-    #         with io_helpers.get_cloned_git_path(template.git_repo,
-    #                                             template.git_branch) as tmpdir:
-    #             path = find_path(tmpdir, template.entrypoint)
-    #             parsed = parser.parse_from_path(path)
-    #     elif template.location_type == 'url':
-    #         tmpdir = tempfile.mkdtemp()
-    #         os.chdir(tmpdir)
-    #         path = download(template.template)
-    #         try:
-    #             unpack(path, tmpdir)
-    #             path = find_path(tmpdir, template.entrypoint)
-    #         except:
-    #             pass
-    #         parsed = parser.parse_from_path(path)
-    #     elif template.location_type == 'inline':
-    #         parsed = parser.parse(template.template)
-    #     template.workflows = get_workflows(parsed)
-    #     template.inputs = form_inputs(parsed["inputs"])
-    #     return template
-
+    return
 
 def form_inputs(inputs):
     ret = []
