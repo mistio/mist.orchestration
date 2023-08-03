@@ -9,7 +9,7 @@ from functools import cmp_to_key
 
 import mongoengine as me
 
-import dsl_parser.parser as parser
+#import dsl_parser.parser as parser
 
 from mist.api import helpers as io_helpers
 
@@ -229,27 +229,27 @@ def get_workflows(parsed):
 
 
 def analyze_template(template):
-    if template.exec_type == 'cloudify':
-        if template.location_type == 'github':
-            with io_helpers.get_cloned_git_path(template.git_repo,
-                                                template.git_branch) as tmpdir:
-                path = find_path(tmpdir, template.entrypoint)
-                parsed = parser.parse_from_path(path)
-        elif template.location_type == 'url':
-            tmpdir = tempfile.mkdtemp()
-            os.chdir(tmpdir)
-            path = download(template.template)
-            try:
-                unpack(path, tmpdir)
-                path = find_path(tmpdir, template.entrypoint)
-            except:
-                pass
-            parsed = parser.parse_from_path(path)
-        elif template.location_type == 'inline':
-            parsed = parser.parse(template.template)
-        template.workflows = get_workflows(parsed)
-        template.inputs = form_inputs(parsed["inputs"])
-        return template
+    # if template.exec_type == 'cloudify':
+    #     if template.location_type == 'github':
+    #         with io_helpers.get_cloned_git_path(template.git_repo,
+    #                                             template.git_branch) as tmpdir:
+    #             path = find_path(tmpdir, template.entrypoint)
+    #             parsed = parser.parse_from_path(path)
+    #     elif template.location_type == 'url':
+    #         tmpdir = tempfile.mkdtemp()
+    #         os.chdir(tmpdir)
+    #         path = download(template.template)
+    #         try:
+    #             unpack(path, tmpdir)
+    #             path = find_path(tmpdir, template.entrypoint)
+    #         except:
+    #             pass
+    #         parsed = parser.parse_from_path(path)
+    #     elif template.location_type == 'inline':
+    #         parsed = parser.parse(template.template)
+    #     template.workflows = get_workflows(parsed)
+    #     template.inputs = form_inputs(parsed["inputs"])
+    #     return template
 
 
 def form_inputs(inputs):
